@@ -1,7 +1,12 @@
 import { MyReact } from "./myreact";
 
 /** @jsx MyReact.createElement */
-const element = <h1 id="foo">hello</h1>;
+const element = (
+	<div id="foo">
+		<p>hello</p>
+	</div>
+);
 
-console.log("hello world");
+const root = document.getElementById("root")!;
 console.log(element);
+MyReact.render(element, root);
