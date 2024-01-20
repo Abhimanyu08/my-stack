@@ -4,9 +4,11 @@ import { MyReact } from "./myreact";
 const element = (
 	<div id="foo">
 		<p>hello</p>
+		<span>bye</span>
+		<span> </span>
+		<span>world</span>
 	</div>
 );
 
 const root = document.getElementById("root")!;
-console.log(element);
 MyReact.render(element, root);
