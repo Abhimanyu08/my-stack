@@ -34,7 +34,7 @@ export const MyReact = {
 	},
 
 	render(element: JSXElement, container: HTMLElement) {
-		nextUnitOfWork = {
+		rootFiber = {
 			dom: container,
 			type: "root",
 			props: {
@@ -45,6 +45,7 @@ export const MyReact = {
 			child: null
 		};
 
+		nextUnitOfWork = rootFiber
 		requestIdleCallback(workloop);
 
 
@@ -74,6 +75,7 @@ export const MyReact = {
 
 //But we can't perform whole of render duing browser's idle time. We need to break render into small steps.
 
+let rootFiber: Fiber | null = null
 let nextUnitOfWork: Fiber | null = null;
 
 function performUnitOfWork(unitOfWork: Fiber | null): Fiber | null {
@@ -107,9 +109,11 @@ function performUnitOfWork(unitOfWork: Fiber | null): Fiber | null {
 	}
 
 	// ----------------------------Attach the new DOM element to the parent's DOM--------------------------------
-	if (unitOfWork.parent) {
-		unitOfWork.parent.dom?.appendChild(htmlNode)
-	}
+	// Now that we've split our work in chunks, the problem lies here. We are adding an HtmlNode to the DOM while performing the work. This work can be interrupted anytime by the browser, which may lead to user seeing an incomplete UI. The solution to this would be to build the whole fiber tree in idle times, and then commit all the dom nodes corresponding to every leaf in the fiber to the actual DOM at once. Let's comment out the "Attach new Dom element to the parent's DOM" part
+
+	// if (unitOfWork.parent) {
+	// 		unitOfWork.parent.dom?.appendChild(htmlNode)
+	// }
 
 	// -----------------------------Making a fiber for every child---------------------------------------	
 	let i = 0
@@ -158,5 +162,29 @@ const workloop: IdleRequestCallback = (deadline) => {
 		shouldStopThisCallback = deadline.timeRemaining() < 1;
 	}
 
+	if (rootFiber && !nextUnitOfWork) {
+		commitRoot()
+	}
+	rootFiber = null;
 	requestIdleCallback(workloop);
 };
+
+
+function commitRoot() {
+
+	if (rootFiber?.dom) {
+		let child = rootFiber.child
+		if (child) {
+			rootFiber.dom.appendChild(child.dom!)
+			rootFiber = child
+			commitRoot()
+		}
+		while (child?.sibling) {
+			child.parent!.dom!.appendChild(child.sibling.dom!)
+			child = child.sibling
+			rootFiber = child
+			commitRoot()
+		}
+	}
+
+}
