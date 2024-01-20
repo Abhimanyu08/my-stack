@@ -36,7 +36,7 @@ export const MyReact = {
 	render(element: JSXElement, container: HTMLElement) {
 		rootFiber = {
 			dom: container,
-			type: "root",
+			type: container.tagName as any,
 			props: {
 				children: [element],
 			},
@@ -78,14 +78,12 @@ export const MyReact = {
 let rootFiber: Fiber | null = null
 let nextUnitOfWork: Fiber | null = null;
 
-function performUnitOfWork(unitOfWork: Fiber | null): Fiber | null {
+function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
 	//A unit of work consists of
 	// 1. Making a DOM element for the Fiber
-	// 2. Attach the new DOM element to the parent's DOM
+	// 2. Attach the new DOM element to the parent's DOM - this step is removed from latest implementation because we add stuff to DOM in one go rather than on every performUnitOfWork call.
 	// 2. Making a Fiber for all the children
 	// 3. Returning back the next unit of work
-
-	if (unitOfWork === null) return null;
 
 	// ----------------------------Making a DOM element for the Fiber--------------------------------
 	let htmlNode = unitOfWork.dom;
@@ -188,3 +186,6 @@ function commitRoot() {
 	}
 
 }
+
+
+
