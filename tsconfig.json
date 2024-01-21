@@ -4,6 +4,14 @@
 		"module": "commonjs",
 		"jsx": "react",
 		"strict": true,
-		"noImplicitAny": false
-	}
+		"noImplicitAny": false,
+		"types": ["jest", "node"]
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"src/tests/**/*.ts",
+		"src/tests/**/*.tsx",
+		"src/tests/createElement.test.jsx"
+	]
 }
