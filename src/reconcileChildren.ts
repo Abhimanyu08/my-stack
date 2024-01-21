@@ -18,7 +18,7 @@ export default function reconcileChildren(unitOfWork: Fiber, deletions: Fiber[])
                 type: child.type,
                 sibling: null,
                 child: null,
-                operation: "NOP",
+                operation: "PLACEMENT",
                 alternate: alternateFiber
             }
         }

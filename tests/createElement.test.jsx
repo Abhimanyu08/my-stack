@@ -1,4 +1,4 @@
-const { MyReact } = require("../myreact");
+const { MyReact } = require("../src/myreact");
 
 /** @jsx MyReact.createElement */
 const element = (

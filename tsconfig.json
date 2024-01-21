@@ -10,8 +10,8 @@
 	"include": [
 		"src/**/*.ts",
 		"src/**/*.tsx",
-		"src/tests/**/*.ts",
-		"src/tests/**/*.tsx",
-		"src/tests/createElement.test.jsx"
+		"tests/**/*.ts",
+		"tests/**/*.tsx",
+		"tests/createElement.test.jsx"
 	]
 }

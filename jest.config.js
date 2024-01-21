@@ -1,7 +1,7 @@
 // jest.config.js
 module.exports = {
 	preset: "ts-jest",
-	testEnvironment: "node",
+	testEnvironment: "jsdom",
 	transform: {
 		"^.+\\.tsx?$": "ts-jest",
 		"^.+\\.jsx?$": "babel-jest",
