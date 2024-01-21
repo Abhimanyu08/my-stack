@@ -22,7 +22,7 @@ const unitOfWorkWithoutAlternate = {
 
 reconcileChildren(unitOfWorkWithoutAlternate, deletions);
 
-test("reconciled children correctly", () => {
+test("reconciled new children correctly", () => {
 	expect(unitOfWorkWithoutAlternate).toHaveProperty("child", {
 		dom: null,
 		parent: unitOfWorkWithoutAlternate,
@@ -42,6 +42,7 @@ const alternateElement = (
 		<p>world</p>
 	</div>
 );
+const divElem = document.createElement("div");
 
 const unitOfWorkWithAlternate = {
 	dom: root,
@@ -49,28 +50,47 @@ const unitOfWorkWithAlternate = {
 	props: {
 		children: [alternateElement],
 	},
-	alternate: unitOfWorkWithoutAlternate,
+	alternate: {
+		...unitOfWorkWithoutAlternate,
+		child: { ...unitOfWorkWithoutAlternate.child, dom: divElem },
+	},
 };
 
 reconcileChildren(unitOfWorkWithAlternate, deletions);
-test("reconciled children correctly", () => {
+test("reconciled updated children correctly", () => {
 	expect(unitOfWorkWithAlternate).toHaveProperty("child", {
-		dom: null,
+		dom: divElem,
 		parent: unitOfWorkWithAlternate,
 		props: alternateElement.props,
 		type: "div",
 		sibling: null,
 		child: null,
 		operation: "UPDATE",
-		alternate: {
-			dom: null,
-			parent: unitOfWorkWithoutAlternate,
-			props: element.props,
-			type: "div",
-			sibling: null,
-			child: null,
-			operation: "PLACEMENT",
-			alternate: null,
-		},
+		alternate: { ...unitOfWorkWithoutAlternate.child, dom: divElem },
+	});
+});
+
+/** @jsx MyReact.createElement */
+const newElement = <span>hello</span>;
+
+const unitOfWorkWithNewChild = {
+	...unitOfWorkWithAlternate,
+	props: {
+		children: [newElement],
+	},
+};
+
+reconcileChildren(unitOfWorkWithNewChild, deletions);
+
+test("reconciled replaced children correctly", () => {
+	expect(unitOfWorkWithNewChild).toHaveProperty("child", {
+		dom: null,
+		parent: unitOfWorkWithNewChild,
+		props: newElement.props,
+		type: "span",
+		sibling: null,
+		child: null,
+		operation: "PLACEMENT",
+		alternate: null,
 	});
 });

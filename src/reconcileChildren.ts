@@ -19,7 +19,7 @@ export default function reconcileChildren(unitOfWork: Fiber, deletions: Fiber[])
                 sibling: null,
                 child: null,
                 operation: "PLACEMENT",
-                alternate: alternateFiber
+                alternate: null
             }
         }
 
@@ -28,8 +28,10 @@ export default function reconcileChildren(unitOfWork: Fiber, deletions: Fiber[])
             // both are of same type, only needs an update
             fiber.operation = "UPDATE"
             fiber.dom = alternateFiber.dom
+            fiber.alternate = alternateFiber
         }
         if (fiber && alternateFiber && (fiber.type !== alternateFiber.type)) {
+            fiber.alternate = null
             fiber.operation = "PLACEMENT"
         }
         if (alternateFiber && !fiber) {
