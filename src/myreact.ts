@@ -1,6 +1,7 @@
 import createElement from "./createElement";
 import reconcileChildren from "./reconcileChildren";
 import { Fiber, JSXElement } from "./types";
+import updateDom from "./updateDom";
 
 export const MyReact = {
 	createElement: createElement,
@@ -16,32 +17,11 @@ export const MyReact = {
 			sibling: null,
 			child: null,
 			alternate: currentRoot,
-			operation: "NOP"
+			operation: "PLACEMENT"
 		};
 
 		nextUnitOfWork = wipRoot
 		requestIdleCallback(workloop);
-
-
-		// ---------------------------------Naive way of doing things---------------------------------
-		// let htmlNode: Text | HTMLElement;
-		// if (element.type === "TEXT_NODE") {
-		// 	htmlNode = document.createTextNode(element.props.nodeValue);
-		// } else {
-		// 	htmlNode = document.createElement(element.type);
-		// 	if (element.props) {
-		// 		for (let [k, v] of Object.entries(element.props)) {
-		// 			if (k === "children") continue;
-		// 			htmlNode.setAttribute(k, v);
-		// 		}
-		// 	}
-
-		// 	for (let child of element.props.children) {
-		// 		this.render(child, htmlNode);
-		// 	}
-		// }
-
-		// container.appendChild(htmlNode);
 	},
 };
 
@@ -54,36 +34,16 @@ let currentRoot: Fiber | null = null
 let deletions: Fiber[] = []
 let nextUnitOfWork: Fiber | null = null;
 
+
 function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
-	//A unit of work consists of
-	// 1. Making a DOM element for the Fiber
-	// 2. Attach the new DOM element to the parent's DOM - this step is removed from latest implementation because we add stuff to DOM in one go rather than on every performUnitOfWork call.
-	// 2. Making a Fiber for all the children
-	// 3. Returning back the next unit of work
 
-	// ----------------------------Making a DOM element for the Fiber--------------------------------
-	let htmlNode = unitOfWork.dom;
-	if (!htmlNode) {
-		if (unitOfWork.type === "TEXT_NODE") {
+	//---------------------------------Do the work on given fiber---------------------------
+	// At this stage, fibers have an operation tag which has the value of "UPDATE" or "PLACEMENT". We have to do the appropriate thing for each one
 
-			htmlNode = document.createTextNode(unitOfWork.props.nodeValue)
-		}
-		else {
 
-			htmlNode = document.createElement(unitOfWork.type);
-			if (unitOfWork.props) {
-				for (let [k, v] of Object.entries(unitOfWork.props)) {
-					if (k === "children") continue;
-					htmlNode.setAttribute(k, v);
-				}
-			}
-		}
-		unitOfWork.dom = htmlNode
 
-	}
-
-	// -----------------------------Making a fiber for every child---------------------------------------	
-
+	updateDom(unitOfWork)
+	// -----------------------------Reconcile children---------------------------------------	
 	reconcileChildren(unitOfWork, deletions)
 
 

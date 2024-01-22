@@ -14,5 +14,5 @@ export type Fiber = {
     sibling: Fiber | null;
     child: Fiber | null;
     alternate: Fiber | null;
-    operation: "UPDATE" | "DELETE" | "PLACEMENT" | "NOP"
+    operation: "UPDATE" | "PLACEMENT"
 };
