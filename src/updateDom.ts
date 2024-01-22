@@ -3,6 +3,7 @@ import { Fiber } from "./types"
 const isEvent = (key: string) => key.startsWith("on")
 export default function updateDom(unitOfWork: Fiber) {
 
+    if (typeof unitOfWork.type === "function") return
     if (!unitOfWork.dom) {
         unitOfWork.dom = unitOfWork.type === "TEXT_NODE" ? document.createTextNode(unitOfWork.props.nodeValue) : document.createElement(unitOfWork.type)
     }

@@ -1,10 +1,11 @@
 import { JSXElement } from "./types";
 
 export default function createElement(
-    type: keyof HTMLElementTagNameMap,
+    type: keyof HTMLElementTagNameMap | ((props) => JSXElement),
     props: Record<string, any>,
     ...children: JSXElement[]
 ): JSXElement {
+
     return {
         type,
         props: {

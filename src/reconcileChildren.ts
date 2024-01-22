@@ -6,8 +6,9 @@ export default function reconcileChildren(unitOfWork: Fiber, deletions: Fiber[])
     let prevFiber: Fiber | null = null
     let alternateFiber = unitOfWork?.alternate ? unitOfWork.alternate.child : null
     //the loop should go on till max(number of children of unitofwork, number of children of unitofwork.alternate)
-    while (i < unitOfWork.props.children.length || alternateFiber !== null) {
-        const child = unitOfWork.props.children.at(i)
+    const children = typeof unitOfWork.type === "function" ? [unitOfWork.type(unitOfWork.props)] : unitOfWork.props.children
+    while (i < children.length || alternateFiber !== null) {
+        const child = children.at(i)
         let fiber: Fiber | null = null
         if (child) {
 
@@ -41,7 +42,7 @@ export default function reconcileChildren(unitOfWork: Fiber, deletions: Fiber[])
 
         if (i === 0) {
             unitOfWork.child = fiber
-        } else if (i < unitOfWork.props.children.length) {
+        } else if (i < children.length) {
             if (prevFiber) prevFiber.sibling = fiber
         }
         if (fiber) prevFiber = fiber
