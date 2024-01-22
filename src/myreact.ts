@@ -71,10 +71,8 @@ const workloop: IdleRequestCallback = (deadline) => {
 	}
 
 	if (wipRoot && !nextUnitOfWork) {
-		console.log(wipRoot)
 		commitWork()
-		currentRoot = wipRoot
-		wipRoot = null;
+
 	}
 	requestIdleCallback(workloop);
 };
@@ -83,12 +81,14 @@ const workloop: IdleRequestCallback = (deadline) => {
 function commitWork() {
 	if (wipRoot?.child)
 		commitFiber(wipRoot?.child)
+	currentRoot = wipRoot
+	wipRoot = null;
 }
 
 
 function commitFiber(fiber: Fiber) {
 
-	//committing a fiber is just attaching the fiber's dom to it's parent's dom. The parent of a fiber might be the function which doesn't have a dom. In that case we may have to traverse the parent branch till we find one which has a dom
+	//committing a fiber is just attaching the fiber's dom to it's parent's dom. The parent of a fiber might be the function which doesn't have a dom when the fiber is child of a function component. In that case we may have to traverse the parent branch till we find one which has 
 
 	if (!fiber.parent) return
 
