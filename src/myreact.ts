@@ -24,15 +24,27 @@ export const MyReact = {
 		requestIdleCallback(workloop);
 	},
 };
+export function useState<T>(value: T) {
+
+	const fiber = nextUnitOfWork
+	if (!fiber) return
+	if (!fiber.state) fiber.state = value
+	function setValue(newValue: T) {
+		if (!fiber) return
+
+		fiber.state = newValue
+		fiber.alternate = fiber
+		fiber.operation = "UPDATE"
+		nextUnitOfWork = fiber
+		// wipRoot = nextUnitOfWork
+	}
+
+	return [fiber!.state, setValue] as const
+}
 
 //what we want is to perform the render in idle times of the browser. In future, render will be called everytime the state of a component changes. If the state of root component changes, this will post a problem because everytime state change will block the main event loop while the render function finishes.
 
 //But we can't perform whole of render during browser's idle time. We need to break render into small steps.
-
-let wipRoot: Fiber | null = null
-let currentRoot: Fiber | null = null
-let deletions: Fiber[] = []
-let nextUnitOfWork: Fiber | null = null;
 
 
 function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
@@ -66,6 +78,9 @@ function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
 const workloop: IdleRequestCallback = (deadline) => {
 	let shouldStopThisCallback = false;
 	while (nextUnitOfWork && !shouldStopThisCallback) {
+		console.log("-----------------Performing work 1-----------")
+		console.log(nextUnitOfWork)
+		console.log("-----------------Performing work 2-----------")
 		nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
 		shouldStopThisCallback = deadline.timeRemaining() < 1;
 	}
@@ -114,5 +129,8 @@ function commitFiber(fiber: Fiber) {
 
 }
 
-
+let wipRoot: Fiber | null = null
+let currentRoot: Fiber | null = null
+let deletions: Fiber[] = []
+let nextUnitOfWork: Fiber | null = null;
 

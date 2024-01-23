@@ -7,7 +7,10 @@ export default function updateDom(unitOfWork: Fiber) {
     if (!unitOfWork.dom) {
         unitOfWork.dom = unitOfWork.type === "TEXT_NODE" ? document.createTextNode(unitOfWork.props.nodeValue) : document.createElement(unitOfWork.type)
     }
-    if (unitOfWork.type === "TEXT_NODE") return
+    if (unitOfWork.type === "TEXT_NODE") {
+        (unitOfWork.dom as Text).nodeValue = unitOfWork.props.nodeValue
+        return
+    }
 
     if (unitOfWork.operation === "UPDATE") {
         // remove old attributes

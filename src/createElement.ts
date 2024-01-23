@@ -11,9 +11,9 @@ export default function createElement(
         props: {
             ...props,
             children: children.map((c) => {
-                return typeof c === "string"
-                    ? { type: "TEXT_NODE", props: { nodeValue: c, children: [] } }
-                    : c;
+                return typeof c === "object"
+                    ? c
+                    : { type: "TEXT_NODE", props: { nodeValue: c, children: [] } }
             }),
         },
     };

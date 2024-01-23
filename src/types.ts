@@ -6,6 +6,8 @@ export type JSXElement = {
     };
 };
 
+
+
 export type Fiber = {
     dom: HTMLElement | Text | null;
     type: JSXElement["type"] | "root";
@@ -15,4 +17,5 @@ export type Fiber = {
     child: Fiber | null;
     alternate: Fiber | null;
     operation: "UPDATE" | "PLACEMENT"
-};
+    state?: any
+} 
