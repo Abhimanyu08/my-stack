@@ -36,7 +36,7 @@ export function useState<T>(value: T) {
 		fiber.alternate = fiber
 		fiber.operation = "UPDATE"
 		nextUnitOfWork = fiber
-		// wipRoot = nextUnitOfWork
+		wipRoot = nextUnitOfWork
 	}
 
 	return [fiber!.state, setValue] as const
@@ -57,6 +57,7 @@ function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
 	updateDom(unitOfWork)
 	// -----------------------------Reconcile children---------------------------------------	
 	reconcileChildren(unitOfWork, deletions)
+
 
 
 	// -----------------------------Returning the new unit of work--------------------------------------	
@@ -97,6 +98,11 @@ function commitWork() {
 	if (wipRoot?.child)
 		commitFiber(wipRoot?.child)
 	currentRoot = wipRoot
+	deletions.forEach((fiber) => {
+		if (!fiber.parent || !fiber.dom) return
+		fiber.parent.dom!.removeChild(fiber.dom)
+	})
+	deletions = []
 	wipRoot = null;
 }
 

@@ -2,11 +2,19 @@ import { MyReact, useState } from "./myreact";
 
 /** @jsx MyReact.createElement */
 function Counter() {
-	const [count, setCount] = useState(1);
+	const [status, setStatus] = useState<"show" | "hide">("show");
 	return (
 		<div>
-			<p>{count}</p>
-			<button onClick={() => setCount(count + 1)}>increase</button>
+			{status === "show" ? <p>peekaboo</p> : <p></p>}
+			<button
+				onClick={
+					status === "show"
+						? () => setStatus("hide")
+						: () => setStatus("show")
+				}
+			>
+				{status === "show" ? "hide" : "show"}
+			</button>
 		</div>
 	);
 }
