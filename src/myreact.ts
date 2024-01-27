@@ -28,18 +28,24 @@ export function useState<T>(value: T) {
 
 	const fiber = nextUnitOfWork
 	if (!fiber) return
-	if (!fiber.state) fiber.state = value
+	const hookNumber = hookIndex
+	// if this useState is being run the first time fiber.alternate is null.
+	if (!fiber.alternate) {
+		if (!fiber.state) fiber.state = []
+		fiber.state.push(value)
+	}
 	function setValue(newValue: T) {
 		if (!fiber) return
 
-		fiber.state = newValue
 		fiber.alternate = fiber
 		fiber.operation = "UPDATE"
+		fiber.state![hookNumber] = newValue
 		nextUnitOfWork = fiber
 		wipRoot = nextUnitOfWork
 	}
 
-	return [fiber!.state, setValue] as const
+	hookIndex++
+	return [fiber.state![hookNumber], setValue] as const
 }
 
 //what we want is to perform the render in idle times of the browser. In future, render will be called everytime the state of a component changes. If the state of root component changes, this will post a problem because everytime state change will block the main event loop while the render function finishes.
@@ -55,6 +61,9 @@ function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
 
 
 	updateDom(unitOfWork)
+	if (typeof unitOfWork.type === "function") {
+		hookIndex = 0;
+	}
 	// -----------------------------Reconcile children---------------------------------------	
 	reconcileChildren(unitOfWork, deletions)
 
@@ -79,14 +88,12 @@ function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
 const workloop: IdleRequestCallback = (deadline) => {
 	let shouldStopThisCallback = false;
 	while (nextUnitOfWork && !shouldStopThisCallback) {
-		console.log("-----------------Performing work 1-----------")
-		console.log(nextUnitOfWork)
-		console.log("-----------------Performing work 2-----------")
 		nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
 		shouldStopThisCallback = deadline.timeRemaining() < 1;
 	}
 
 	if (wipRoot && !nextUnitOfWork) {
+		console.log(wipRoot)
 		commitWork()
 
 	}
@@ -139,4 +146,5 @@ let wipRoot: Fiber | null = null
 let currentRoot: Fiber | null = null
 let deletions: Fiber[] = []
 let nextUnitOfWork: Fiber | null = null;
+let hookIndex = 0;
 

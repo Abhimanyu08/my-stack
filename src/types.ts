@@ -17,5 +17,5 @@ export type Fiber = {
     child: Fiber | null;
     alternate: Fiber | null;
     operation: "UPDATE" | "PLACEMENT"
-    state?: any
+    state?: any[]
 } 
