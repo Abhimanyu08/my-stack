@@ -99,6 +99,7 @@ const workloop: IdleRequestCallback = (deadline) => {
 	}
 
 	if (wipRoot && !nextUnitOfWork) {
+		console.log(wipRoot, deletions)
 		commitWork()
 
 	}

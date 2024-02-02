@@ -6,7 +6,7 @@ function Counter() {
 	const [count, setCount] = useState(0);
 	return (
 		<div>
-			{status === "show" ? <p>peekaboo</p> : <p></p>}
+			{status === "show" ? <p>peekaboo</p> : <span></span>}
 			<button
 				onClick={
 					status === "show"

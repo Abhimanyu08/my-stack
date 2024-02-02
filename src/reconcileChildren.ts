@@ -34,6 +34,7 @@ export default function reconcileChildren(unitOfWork: Fiber, deletions: Fiber[])
         if (fiber && alternateFiber && (fiber.type !== alternateFiber.type)) {
             fiber.alternate = null
             fiber.operation = "PLACEMENT"
+            deletions.push(alternateFiber)
         }
         if (alternateFiber && !fiber) {
             //fiber has to be deleted
