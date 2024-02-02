@@ -6,7 +6,7 @@
 	"scripts": {
 		"test": "npx jest",
 		"build": "webpack --watch",
-		"start": "npx webpack serve --open",
+		"start": "nodemon --watch src --ext ts,tsx --exec \"npx webpack\"",
 		"watch": "nodemon --watch src --exec npx webpack'"
 	},
 	"keywords": [],

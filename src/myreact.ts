@@ -26,26 +26,32 @@ export const MyReact = {
 };
 export function useState<T>(value: T) {
 
-	const fiber = nextUnitOfWork
-	if (!fiber) return
+	const fiber = nextUnitOfWork!
 	const hookNumber = hookIndex
 	// if this useState is being run the first time fiber.alternate is null.
 	if (!fiber.alternate) {
 		if (!fiber.state) fiber.state = []
 		fiber.state.push(value)
 	}
-	function setValue(newValue: T) {
+	function setValue(newValue: T | ((prev: T) => T)) {
 		if (!fiber) return
+		const newFiber: Fiber = { ...fiber, state: fiber.state! }
 
-		fiber.alternate = fiber
-		fiber.operation = "UPDATE"
-		fiber.state![hookNumber] = newValue
-		nextUnitOfWork = fiber
+		newFiber.alternate = fiber
+		newFiber.operation = "UPDATE"
+		if (typeof newValue === "function") {
+
+			newFiber.state![hookNumber] = (newValue as (prev: T) => T)(fiber.state![hookNumber])
+		} else {
+			newFiber.state![hookNumber] = newValue
+		}
+		nextUnitOfWork = newFiber
 		wipRoot = nextUnitOfWork
 	}
 
 	hookIndex++
-	return [fiber.state![hookNumber], setValue] as const
+	let currentVal = fiber.state![hookNumber]
+	return [currentVal, setValue] as const
 }
 
 //what we want is to perform the render in idle times of the browser. In future, render will be called everytime the state of a component changes. If the state of root component changes, this will post a problem because everytime state change will block the main event loop while the render function finishes.
@@ -93,7 +99,6 @@ const workloop: IdleRequestCallback = (deadline) => {
 	}
 
 	if (wipRoot && !nextUnitOfWork) {
-		console.log(wipRoot)
 		commitWork()
 
 	}

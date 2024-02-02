@@ -17,7 +17,7 @@ function Counter() {
 				{status === "show" ? "hide" : "show"}
 			</button>
 			<p>{count}</p>
-			<button onClick={() => setCount(count + 1)}>Increment</button>
+			<button onClick={() => setCount((p) => p + 1)}>Increment</button>
 		</div>
 	);
 }
