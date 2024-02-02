@@ -28,9 +28,9 @@ export function useState<T>(value: T) {
 
 	const fiber = nextUnitOfWork!
 	const hookNumber = hookIndex
-	// if this useState is being run the first time fiber.alternate is null.
-	if (!fiber.alternate) {
-		if (!fiber.state) fiber.state = []
+	if (!fiber.state) {
+
+		fiber.state = []
 		fiber.state.push(value)
 	}
 	function setValue(newValue: T | ((prev: T) => T)) {
@@ -129,6 +129,8 @@ function commitFiber(fiber: Fiber) {
 	if (!fiber.dom) {
 		if (fiber.child)
 			commitFiber(fiber.child)
+
+		if (fiber.sibling) commitFiber(fiber.sibling)
 		return
 	}
 
