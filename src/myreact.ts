@@ -46,7 +46,7 @@ export function useState<T>(value: T) {
 			newFiber.state![hookNumber] = newValue
 		}
 		nextUnitOfWork = newFiber
-		wipRoot = nextUnitOfWork
+		wipFiber = nextUnitOfWork
 	}
 
 	hookIndex++
@@ -63,17 +63,12 @@ function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
 
 	//---------------------------------Do the work on given fiber---------------------------
 	// At this stage, fibers have an operation tag which has the value of "UPDATE" or "PLACEMENT". We have to do the appropriate thing for each one
-
-
-
 	updateDom(unitOfWork)
 	if (typeof unitOfWork.type === "function") {
 		hookIndex = 0;
 	}
 	// -----------------------------Reconcile children---------------------------------------	
 	reconcileChildren(unitOfWork, deletions)
-
-
 
 	// -----------------------------Returning the new unit of work--------------------------------------	
 	if (unitOfWork.child) {
@@ -99,9 +94,12 @@ const workloop: IdleRequestCallback = (deadline) => {
 	}
 
 	if (wipRoot && !nextUnitOfWork) {
-		console.log(wipRoot, deletions)
 		commitWork()
-
+	}
+	if (wipFiber) {
+		console.log(wipFiber)
+		if (wipFiber.child) commitFiber(wipFiber.child)
+		wipFiber = null
 	}
 	requestIdleCallback(workloop);
 };
@@ -129,8 +127,9 @@ function commitFiber(fiber: Fiber) {
 	if (!fiber.dom) {
 		if (fiber.child)
 			commitFiber(fiber.child)
+		if (fiber.sibling)
+			commitFiber(fiber.sibling)
 
-		if (fiber.sibling) commitFiber(fiber.sibling)
 		return
 	}
 
@@ -151,6 +150,7 @@ function commitFiber(fiber: Fiber) {
 }
 
 let wipRoot: Fiber | null = null
+let wipFiber: Fiber | null = null
 let currentRoot: Fiber | null = null
 let deletions: Fiber[] = []
 let nextUnitOfWork: Fiber | null = null;
